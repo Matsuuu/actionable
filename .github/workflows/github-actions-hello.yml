@@ -1,5 +1,5 @@
 name: GitHub Actions Demo
-run-name: ${{ github.actor }} ran this at $(date + '%Y-%m-%d')
+run-name: ${{ github.actor }} ran this for reason ${{ inputs.run_reason }}
 on:
   push:
   workflow_dispatch:
