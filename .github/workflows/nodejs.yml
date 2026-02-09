@@ -1,0 +1,22 @@
+name: GitHub Actions Demo
+run-name: ${{ github.actor }} ran this for reason ${{ inputs.run_reason || 'Default Reason' }}
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  setup-node:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+
+      - name: Upgrade npm (keep Node 22)
+        run: npm i -g npm@11.5.1
+
+      - name: Verify
+        run: |
+          node -v
+          npm -v
