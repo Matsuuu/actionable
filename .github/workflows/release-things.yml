@@ -316,6 +316,9 @@ jobs:
             const oldFound = labels.find(l => l.name === oldLabel);
             const newFound = labels.find(l => l.name === newLabel);
 
+            core.info(`Tried to find old label ${oldLabel}. Did we? ${oldFound}`);
+            core.info(`Tried to find new label ${newLabel}. Did we? ${newFound}`);
+
             if (oldFound) {
               // Update/rename old -> new
               // issues.updateLabel uses current label name in URL, passed as "name"
