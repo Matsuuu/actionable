@@ -1,7 +1,6 @@
-name: GitHub Actions Demo
-run-name: ${{ github.actor }} ran this for reason ${{ inputs.run_reason || 'Default Reason' }}
+name: Nodejs
+run-name: nodejs
 on:
-  push:
   workflow_dispatch:
 
 jobs:
