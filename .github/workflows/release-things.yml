@@ -231,8 +231,7 @@ jobs:
             const aliasPrerelease = alias === 'beta';
             const aliasMakeLatest = alias === 'stable' ? 'true' : 'false';
 
-            // Move the alias tag to the version tag commit (force-update the ref)
-            // 1) Resolve the SHA of the version tag
+            // Resolve the SHA of the version tag (release/X.Y.Z)
             const tagRef = await github.rest.git.getRef({ owner, repo, ref: `tags/${tag}` });
             const tagObject = tagRef.data.object;
 
@@ -256,15 +255,33 @@ jobs:
               }
             }
 
+            // 1) If alias release exists, delete it so we don't keep old body/notes
+            const existingAliasRelease = await getReleaseByTag(aliasTag);
+            if (existingAliasRelease) {
+              await github.rest.repos.deleteRelease({
+                owner,
+                repo,
+                release_id: existingAliasRelease.id,
+              });
+              core.info(`Deleted existing ${aliasName} release (${aliasTag})`);
+            } else {
+              core.info(`No existing ${aliasName} release to delete (${aliasTag})`);
+            }
+
+            // 2) Move (or create) the alias tag to the new commit
             await upsertTag(aliasTag, targetSha);
 
-            // Create/update alias release
-            await createOrUpdateRelease({
-              tagName: aliasTag,
+            // 3) Create a fresh alias release with new notes
+            await github.rest.repos.createRelease({
+              owner,
+              repo,
+              tag_name: aliasTag,
               name: aliasName,
               prerelease: aliasPrerelease,
               make_latest: aliasMakeLatest,
+              generate_release_notes: true,
             });
+            core.info(`Created fresh ${aliasName} release (${aliasTag})`);
 
       - name: Create RC branch from version tag
         env:
