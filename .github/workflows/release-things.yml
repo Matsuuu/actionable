@@ -307,13 +307,18 @@ jobs:
             const oldVersion = process.env.OLD_VERSION;
             const rcVersion = process.env.RC_VERSION;
 
-            const oldLabel = `Backport to stable (${oldVersion})`;
+            // We might not have an easy way to find the latest patch number 
+            // so let's just match until the minor number, that should be enough
+            const searchableOldVersion = oldVersion.substring(0, oldVersion.indexOf("."));
+
+            // Again, cutting the label short for searchability
+            const oldLabel = `Backport to stable (${searchableOldVersion}`;
             const newLabel = `Backport to stable (${rcVersion})`;
 
             // List labels (paginate)
             const labels = await github.paginate(github.rest.issues.listLabelsForRepo, { owner, repo, per_page: 100 });
 
-            const oldFound = labels.find(l => l.name === oldLabel);
+            const oldFound = labels.find(l => l.name.startsWith(oldLabel));
             const newFound = labels.find(l => l.name === newLabel);
 
             core.info(`Tried to find old label ${oldLabel}. Did we? ${oldFound}`);
