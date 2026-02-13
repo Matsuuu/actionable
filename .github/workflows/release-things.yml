@@ -332,6 +332,7 @@ jobs:
                 repo,
                 name: oldFound.name,
                 new_name: newLabel,
+                description: "Backport to given version (load-bearing)"
               });
               core.info(`Renamed label: "${oldFound.name}" -> "${newLabel}"`);
               return;
@@ -344,7 +345,7 @@ jobs:
                 repo,
                 name: newLabel,
                 color: "0E8A16",
-                description: `Backport changes to stable ${rcVersion}`,
+                description: "Backport to given version (load-bearing)"
               });
               core.info(`Created label: "${newLabel}"`);
             } else {
