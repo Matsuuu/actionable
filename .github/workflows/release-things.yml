@@ -51,10 +51,11 @@ jobs:
       - name: Decide bump arg + package manager
         id: bumpmeta
         uses: actions/github-script@v7
+        env:
+          BUMP: ${{ inputs.bump }}
         with:
           script: |
-            const bumpInput = core.getInput('bump', { required: true }); // Major|Minor|Patch
-            const bump = bumpInput.toLowerCase(); // major|minor|patch
+            const bump = process.env.BUMP.toLowerCase(); // major|minor|patch
 
             core.setOutput('bump', bump);
 
@@ -73,6 +74,10 @@ jobs:
       - name: Read new version + compute RC version/branch + release flags
         id: meta
         uses: actions/github-script@v7
+        env:
+          BUMP: ${{ inputs.bump }}
+          CHANNEL: ${{ inputs.channel }}
+          OLD_VERSION: ${{ steps.versions_before.outputs.old_version }}
         with:
           script: |
             const fs = require('fs');
@@ -92,8 +97,8 @@ jobs:
             const rcVersion = bumpPatch(newVersion);
             const rcBranch = `release-candidate/${rcVersion}`;
 
-            const bump = core.getInput('bump', { required: true }).toLowerCase(); // major|minor|patch
-            const channel = core.getInput('channel', { required: true }); // stable|beta|old
+            const bump = process.env.BUMP.toLowerCase(); // major|minor|patch
+            const channel = process.env.CHANNEL; // stable|beta|old
 
             // Map "channel" -> GitHub Release flags for the versioned release
             // (old = not latest, not prerelease)
@@ -109,9 +114,6 @@ jobs:
             core.setOutput('channel', channel);
             core.setOutput('versioned_prerelease', String(versionedRelease.prerelease));
             core.setOutput('versioned_make_latest', String(versionedRelease.make_latest));
-
-        env:
-          OLD_VERSION: ${{ steps.versions_before.outputs.old_version }}
 
       - name: Commit version bump
         env:
