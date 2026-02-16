@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: "Current version (e.g. 2.8.1 or v2.8.1)"
+        description: "Current version (e.g. 2.8.1)"
         required: true
         type: string
       bump:
@@ -14,7 +14,7 @@ on:
   workflow_call:
     inputs:
       version:
-        description: "Current version (e.g. 2.8.1 or v2.8.1)"
+        description: "Current version (e.g. 2.8.1)"
         required: true
         type: string
       bump:
@@ -35,50 +35,23 @@ jobs:
     outputs:
       next_version: ${{ steps.bump.outputs.next_version }}
       next_tag: ${{ steps.bump.outputs.next_tag }}
+
     steps:
-      - id: bump
-        shell: bash
-        run: |
-          set -euo pipefail
+      - name: Checkout
+        uses: actions/checkout@v4
 
-          echo "Determining a new Semantic Version for { version: $}"
+      - name: Init NodeJS
+        uses: ./.github/actions/setup-github-actions-node
 
-          raw_version="${{ inputs.version }}"
-          bump="${{ inputs.bump }}"
-
-          # Strip optional leading "release/"
-          version="${raw_version#release/}"
-
-          # Validate basic semver: X.Y.Z
-          if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "Input version must be X.Y.Z or X.Y.Z, got: $raw_version" >&2
-            exit 1
-          fi
-
-          IFS='.' read -r major minor patch <<< "$version"
-
-          case "$bump" in
-            major)
-              major=$((major + 1)); minor=0; patch=0
-              ;;
-            minor)
-              minor=$((minor + 1)); patch=0
-              ;;
-            patch)
-              patch=$((patch + 1))
-              ;;
-            *)
-              echo "bump must be one of: major, minor, patch. Got: $bump" >&2
-              exit 1
-              ;;
-          esac
-
-          next="${major}.${minor}.${patch}"
-
-          echo "next_version=$next" >> "$GITHUB_OUTPUT"
-          echo "next_tag=release/$next" >> "$GITHUB_OUTPUT"
+      - name: Compute next semantic version
+        id: bump
+        working-directory: scripts/github-actions
+        env:
+          VERSION: ${{ inputs.version }}
+          BUMP: ${{ inputs.bump }}
+        run: node ./next-semver.mjs
 
       - name: Print detected versions
         run: |
           echo "Next version: ${{ steps.bump.outputs.next_version }}"
-          echo "Next tag:   ${{ steps.bump.outputs.next_tag }}"
+          echo "Next tag:     ${{ steps.bump.outputs.next_tag }}"

@@ -33,7 +33,8 @@ jobs:
 
       - name: Extract release versions
         id: get-tags
-        run: node scripts/github-actions/get-release-versions.mjs
+        working-directory: scripts/github-actions
+        run: node ./get-release-versions.mjs
 
       - name: Print detected versions
         run: |
