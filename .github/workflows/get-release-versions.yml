@@ -26,7 +26,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # IMPORTANT: fetch full history + tags
+          fetch-depth: 0
 
       - name: Init NodeJS
         uses: ./.github/actions/setup-github-actions-node

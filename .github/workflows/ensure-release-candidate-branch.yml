@@ -34,11 +34,11 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Fetch all tags
-        run: git fetch --tags --force
-
       - name: Init NodeJS
         uses: ./.github/actions/setup-github-actions-node
+
+      - name: Fetch all tags
+        run: git fetch --tags --force
 
       - name: Ensure release-candidate branch exists
         id: rc
