@@ -1,0 +1,17 @@
+name: Init NodeJS for Github Actions
+
+on: workflow_call
+
+jobs:
+  get-versions:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install CI script deps
+        working-directory: scripts/github-actions
+        run: npm ci

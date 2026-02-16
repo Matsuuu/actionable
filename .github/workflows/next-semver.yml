@@ -41,19 +41,21 @@ jobs:
         run: |
           set -euo pipefail
 
-          raw="${{ inputs.version }}"
+          echo "Determining a new Semantic Version for { version: $}"
+
+          raw_version="${{ inputs.version }}"
           bump="${{ inputs.bump }}"
 
-          # Strip optional leading "v"
-          v="${raw#v}"
+          # Strip optional leading "release/"
+          version="${raw_version#release/}"
 
           # Validate basic semver: X.Y.Z
-          if [[ ! "$v" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "Input version must be X.Y.Z or X.Y.Z, got: $raw" >&2
+          if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Input version must be X.Y.Z or X.Y.Z, got: $raw_version" >&2
             exit 1
           fi
 
-          IFS='.' read -r major minor patch <<< "$v"
+          IFS='.' read -r major minor patch <<< "$version"
 
           case "$bump" in
             major)

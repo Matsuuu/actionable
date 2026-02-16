@@ -28,38 +28,12 @@ jobs:
         with:
           fetch-depth: 0 # IMPORTANT: fetch full history + tags
 
-      - name: Fetch all tags
-        run: git fetch --tags --force
+      - name: Init NodeJS
+        uses: ./.github/workflows/init-github-actions-node.yml
 
       - name: Extract release versions
         id: get-tags
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          get_version_for_track() {
-            local track="$1"
-
-            if ! git rev-parse "$track" >/dev/null 2>&1; then
-              echo ""
-              return
-            fi
-
-            commit=$(git rev-parse "${track}^{}")
-
-            git tag --points-at "$commit" \
-              | grep -E '^release\/[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.-]+)?$' \
-              | sort -V \
-              | tail -n 1
-          }
-
-          STABLE_VERSION=$(get_version_for_track stable)
-          BETA_VERSION=$(get_version_for_track beta)
-          LEGACY_VERSION=$(get_version_for_track legacy)
-
-          echo "stable=$STABLE_VERSION" >> "$GITHUB_OUTPUT"
-          echo "beta=$BETA_VERSION" >> "$GITHUB_OUTPUT"
-          echo "legacy=$LEGACY_VERSION" >> "$GITHUB_OUTPUT"
+        run: node scripts/get-release-versions.mjs
 
       - name: Print detected versions
         run: |
