@@ -1,6 +1,7 @@
 name: Get next semantic version
 
 on:
+  workflow_dispatch:
   workflow_call:
     inputs:
       version:
