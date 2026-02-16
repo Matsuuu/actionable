@@ -13,4 +13,5 @@ runs:
 
     - name: Install CI script deps
       working-directory: scripts/github-actions
+      shell: bash
       run: npm ci
