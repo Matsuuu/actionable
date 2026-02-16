@@ -50,6 +50,7 @@ function getSemverTagForTrack(track) {
 }
 
 function main() {
+  /** @type { Record<string, string> } */
   const outputs = {};
   for (const track of RELEASE_TRACKS) {
     outputs[track] = getSemverTagForTrack(track);
