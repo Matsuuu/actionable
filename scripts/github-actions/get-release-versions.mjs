@@ -2,20 +2,11 @@ import semver from "semver";
 import {
   getCommitForRef,
   listTagsPointingAt,
+  RELEASE_PREFIX,
   RELEASE_TRACKS,
+  stripReleasePrefixes,
   writeGithubOutput,
 } from "./github-helpers.mjs";
-
-const RELEASE_PREFIX = "release/";
-
-/**
- * @param {string} tag
- * */
-function stripReleasePrefixes(tag) {
-  return tag.startsWith(RELEASE_PREFIX)
-    ? tag.slice(RELEASE_PREFIX.length)
-    : tag;
-}
 
 /**
  * Given a list of tag names, return the highest semver tag (keeping the original 'v' prefix),

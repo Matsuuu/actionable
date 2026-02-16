@@ -8,6 +8,17 @@ export const RELEASE_TRACKS = [
   "legacy",
 ];
 
+export const RELEASE_PREFIX = "release/";
+
+/**
+ * @param {string} tag
+ * */
+export function stripReleasePrefixes(tag) {
+  return tag.startsWith(RELEASE_PREFIX)
+    ? tag.slice(RELEASE_PREFIX.length)
+    : tag;
+}
+
 /**
  * @param {string} cmd
  * @param {readonly string[]} args
