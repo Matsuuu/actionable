@@ -1,6 +1,5 @@
 name: Init NodeJS for Github Actions
-
-on: workflow_call
+description: Setup Node and install CI script dependencies
 
 runs:
   using: composite
