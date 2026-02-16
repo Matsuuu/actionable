@@ -1,0 +1,72 @@
+name: Get next semantic version
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        description: "Current version (e.g. 2.8.1 or v2.8.1)"
+        required: true
+        type: string
+      bump:
+        description: "Which part to bump: major, minor, patch"
+        required: true
+        type: string
+    outputs:
+      next_version:
+        description: "Next SemVer version (e.g. 2.8.2)"
+        value: ${{ jobs.next.outputs.next_version }}
+      next_tag:
+        description: "Next tag form with release/ prefix (e.g. release/2.8.2)"
+        value: ${{ jobs.next.outputs.next_tag }}
+
+jobs:
+  next:
+    runs-on: ubuntu-latest
+    outputs:
+      next_version: ${{ steps.bump.outputs.next_version }}
+      next_tag: ${{ steps.bump.outputs.next_tag }}
+    steps:
+      - id: bump
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          raw="${{ inputs.version }}"
+          bump="${{ inputs.bump }}"
+
+          # Strip optional leading "v"
+          v="${raw#v}"
+
+          # Validate basic semver: X.Y.Z
+          if [[ ! "$v" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Input version must be X.Y.Z or X.Y.Z, got: $raw" >&2
+            exit 1
+          fi
+
+          IFS='.' read -r major minor patch <<< "$v"
+
+          case "$bump" in
+            major)
+              major=$((major + 1)); minor=0; patch=0
+              ;;
+            minor)
+              minor=$((minor + 1)); patch=0
+              ;;
+            patch)
+              patch=$((patch + 1))
+              ;;
+            *)
+              echo "bump must be one of: major, minor, patch. Got: $bump" >&2
+              exit 1
+              ;;
+          esac
+
+          next="${major}.${minor}.${patch}"
+
+          echo "next_version=$next" >> "$GITHUB_OUTPUT"
+          echo "next_tag=release/$next" >> "$GITHUB_OUTPUT"
+
+      - name: Print detected versions
+        run: |
+          echo "Next version: ${{ steps.bump.outputs.next_version }}"
+          echo "Next tag:   ${{ steps.bump.outputs.next_tag }}"
