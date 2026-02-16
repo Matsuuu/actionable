@@ -29,7 +29,7 @@ jobs:
           fetch-depth: 0 # IMPORTANT: fetch full history + tags
 
       - name: Init NodeJS
-        uses: ./.github/workflows/init-github-actions-node.yml
+        uses: ./.github/actions/setup-github-actions-node
 
       - name: Extract release versions
         id: get-tags
