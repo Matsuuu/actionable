@@ -4,12 +4,12 @@ on:
   workflow_dispatch:
     inputs:
       track:
-        description: "Which track are we releasing? stable | beta | legacy"
+        description: "Which track are we releasing?"
         required: true
         type: choice
         options: [stable, beta, legacy]
       bump:
-        description: "Semver bump: major | minor | patch"
+        description: "Semantic Version bump"
         required: true
         type: choice
         options: [major, minor, patch]
@@ -71,15 +71,13 @@ jobs:
       - name: Plan version
         id: plan
         shell: bash
-        working-directory: ./.github/scripts
-        run: node ./plan-release.mjs
+        run: node ./.github/scripts/plan-release.mjs
 
       - name: Bump versions
         shell: bash
         env:
           NEW_VERSION: ${{ steps.plan.outputs.new_version }}
-        working-directory: ./.github/scripts
-        run: node ./bump-versions.mjs"
+        run: node ./.github/scripts/bump-versions.mjs"
 
       # - name: Commit version bump
       #   shell: bash
