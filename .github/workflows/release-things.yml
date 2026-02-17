@@ -104,15 +104,20 @@ jobs:
           makeLatest: false
           body: Release ${{ steps.plan.outputs.new_version  }}
 
-      # - name: Create mirrored release for track tag
-      #   shell: bash
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #   working-directory: ./.github/scripts
-      #   run: |
-      #     node ./create-mirrored-track-release.mjs \
-      #       --track "${{ env.TRACK }}" \
-      #       --source-tag "release/${{ steps.plan.outputs.new_version }}"
+      - name: Delete existing track release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.track }}
+        run: |
+          gh release view "$TAG" >/dev/null 2>&1 && gh release delete "$TAG" -y || true
+
+      - name: Create mirrored release for track tag
+        uses: ncipollo/release-action@v1 # v1
+        with:
+          tag: ${{ inputs.track }}
+          prerelease: ${{  inputs.track == 'beta' }}
+          makeLatest: false
+          body: Release ${{ inputs.track }}
 
       # - name: Move tags/labels
       #   shell: bash
