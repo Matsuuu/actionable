@@ -77,7 +77,7 @@ jobs:
         shell: bash
         env:
           NEW_VERSION: ${{ steps.plan.outputs.new_version }}
-        run: node ./.github/scripts/bump-versions.mjs"
+        run: node ./.github/scripts/bump-versions.mjs
 
       # - name: Commit version bump
       #   shell: bash
