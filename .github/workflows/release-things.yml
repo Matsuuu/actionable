@@ -126,10 +126,10 @@ jobs:
       #       --beta-version "${{ env.BETA_VERSION }}" \
       #       --legacy-version "${{ env.LEGACY_VERSION }}"
 
-  # ensure_rc_branch:
-  # name: Ensure RC branch exists
-  # needs: [release]
-  # uses: ./.github/workflows/ensure-release-candidate-branch.yml
-  # secrets: inherit
-  # with:
-  # version: ${{ needs.release.outputs.new_version || '' }}
+  ensure_rc_branch:
+    name: Ensure RC branch exists
+    needs: [release]
+    uses: ./.github/workflows/ensure-release-candidate-branch.yml
+    secrets: inherit
+    with:
+      version: ${{ needs.release.outputs.new_version || '' }}
