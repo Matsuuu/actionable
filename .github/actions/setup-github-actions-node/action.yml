@@ -11,6 +11,6 @@ runs:
         cache: npm
 
     - name: Install CI script deps
-      working-directory: scripts/github-actions
+      working-directory: .github/scripts
       shell: bash
       run: npm ci
