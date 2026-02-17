@@ -35,6 +35,15 @@ async function deleteReleaseByTag(tag) {
   return true;
 }
 
+/**
+ * @param { Object } releaseParams
+ * @param { string } releaseParams.tag_name
+ * @param { string } releaseParams.name
+ * @param { string } releaseParams.body
+ * @param { boolean } releaseParams.draft
+ * @param { boolean } releaseParams.prerelease
+ * @param { "true" | "false" | "legacy" } releaseParams.make_latest
+ * */
 async function createOrUpdateRelease({
   tag_name,
   name,
@@ -75,14 +84,14 @@ async function createOrUpdateRelease({
 }
 
 (async () => {
-  const newReleaseData = {
+  const newReleaseData = /** @type { const } */ ({
     tag_name: versionTag,
     name: versionName,
     body: versionBody,
     draft: false,
     prerelease: true,
-    make_latest: false,
-  };
+    make_latest: "false",
+  });
 
   // 1) Create/Update release for the released version tag
   console.log(`Ensuring version release exists for tag "${versionTag}"...`);
@@ -117,7 +126,7 @@ async function createOrUpdateRelease({
     body: currentBetaRelease.body,
     draft: false,
     prerelease: false,
-    make_latest: true,
+    make_latest: "true",
   });
 
   // 5) Create beta release for beta tag, mark as prerelease
