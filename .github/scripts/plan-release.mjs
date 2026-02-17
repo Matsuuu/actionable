@@ -2,6 +2,7 @@ import semver from "semver";
 import {
   ensureEnvVar,
   isReleaseType,
+  RELEASE_PREFIX,
   stripReleasePrefixes,
   writeGithubOutput,
 } from "./github-helpers.mjs";
@@ -53,6 +54,7 @@ if (!next) {
 const output = {
   base_version: cleanedBase,
   new_version: next,
+  new_version_tag: `${RELEASE_PREFIX}${next}`,
 };
 
 writeGithubOutput(output);

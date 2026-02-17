@@ -96,16 +96,14 @@ jobs:
           TRACK: ${{ inputs.track  }}
         run: node ./.github/scripts/push-tags.mjs
 
-      # - name: Create release for version tag
-      #   shell: bash
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #   working-directory: ./.github/scripts
-      #   run: |
-      #     node ./create-gh-release.mjs \
-      #       --tag "release/${{ steps.plan.outputs.new_version }}" \
-      #       --name "${{ steps.plan.outputs.new_version }}" \
-      #       --track "${{ env.TRACK }}"
+      - name: Create a Release on GitHub
+        uses: ncipollo/release-action@v1 # v1
+        with:
+          ref: ${{ env.RELEASE_REF }}
+          tag: ${{ steps.plan.outputs.new_version_tag }}
+          prerelease: ${{  inputs.track == 'beta' }}
+          makeLatest: false
+          body: Release ${{ steps.plan.outputs.new_version  }}
 
       # - name: Create mirrored release for track tag
       #   shell: bash
