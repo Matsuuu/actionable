@@ -42,7 +42,7 @@ jobs:
 
       - name: Ensure release-candidate branch exists
         id: rc
-        working-directory: scripts/github-actions
+        working-directory: ./.github/scripts
         env:
           VERSION: ${{ inputs.version }}
         run: node ./create-release-candidate-branch.mjs
