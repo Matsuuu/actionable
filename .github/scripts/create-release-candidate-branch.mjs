@@ -1,5 +1,6 @@
 import semver from "semver";
 import {
+  ensureEnvVar,
   sh,
   stripReleasePrefixes,
   trySh,
@@ -17,8 +18,7 @@ function localRefExists(ref) {
 }
 
 function main() {
-  const rawVersion = process.env.VERSION;
-  if (!rawVersion) throw new Error("Missing VERSION env var.");
+  const rawVersion = ensureEnvVar("VERSION");
 
   const version = stripReleasePrefixes(rawVersion);
   if (!semver.valid(version)) {

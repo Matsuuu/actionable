@@ -29,6 +29,17 @@ export function isReleaseType(bump) {
 }
 
 /**
+ * @param {string} variableName
+ */
+export function ensureEnvVar(variableName) {
+  const v = process.env[variableName];
+  if (!v) {
+    throw new Error(`Missing required env var: ${variableName}`);
+  }
+  return v;
+}
+
+/**
  * @param {string} cmd
  * @param {readonly string[]} args
  * @param {import("node:child_process").ExecFileOptionsWithStringEncoding} args

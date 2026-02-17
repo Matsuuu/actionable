@@ -79,23 +79,19 @@ jobs:
           NEW_VERSION: ${{ steps.plan.outputs.new_version }}
         run: node ./.github/scripts/bump-versions.mjs
 
-      # - name: Commit version bump
-      #   shell: bash
-      #   run: |
-      #     if git diff --quiet; then
-      #       echo "No changes after version bump (nothing to commit)."
-      #       exit 0
-      #     fi
-      #     git add -A
-      #     git commit -m "Release: ${{ steps.plan.outputs.new_version }}"
+      - name: Commit version bump
+        shell: bash
+        run: |
+          if git diff --quiet; then
+            echo "No changes after version bump (nothing to commit)."
+            exit 0
+          fi
+          git add -A
+          git commit -m "Release: ${{ steps.plan.outputs.new_version }}"
 
-      # - name: Create and push tags
-      #   shell: bash
-      #   working-directory: ./.github/scripts
-      #   run: |
-      #     node ./push-tags.mjs \
-      #       --new-version "${{ steps.plan.outputs.new_version }}" \
-      #       --track "${{ env.TRACK }}"
+      - name: Create and push tags
+        shell: bash
+        run: node ./.github/scripts/push-tags.mjs
 
       # - name: Create release for version tag
       #   shell: bash

@@ -1,16 +1,17 @@
 import semver from "semver";
 import {
+  ensureEnvVar,
   isReleaseType,
   stripReleasePrefixes,
   writeGithubOutput,
 } from "./github-helpers.mjs";
 
-const track = process.env.TRACK;
-const bump = process.env.BUMP;
+const track = ensureEnvVar("TRACK");
+const bump = ensureEnvVar("BUMP");
 
-const stable = process.env.STABLE_VERSION;
-const beta = process.env.BETA_VERSION;
-const legacy = process.env.LEGACY_VERSION;
+const stable = ensureEnvVar("STABLE_VERSION");
+const beta = ensureEnvVar("BETA_VERSION");
+const legacy = ensureEnvVar("LEGACY_VERSION");
 
 let base = null;
 switch (track) {

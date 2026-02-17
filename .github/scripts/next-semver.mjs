@@ -1,5 +1,6 @@
 import semver from "semver";
 import {
+  ensureEnvVar,
   isReleaseType,
   RELEASE_PREFIX,
   stripReleasePrefixes,
@@ -7,8 +8,8 @@ import {
 } from "./github-helpers.mjs";
 
 function main() {
-  const rawVersion = process.env.VERSION;
-  const bump = process.env.BUMP;
+  const rawVersion = ensureEnvVar("VERSION");
+  const bump = ensureEnvVar("BUMP");
 
   if (!rawVersion) throw new Error("Missing VERSION env var.");
   if (!bump) throw new Error("Missing BUMP env var.");

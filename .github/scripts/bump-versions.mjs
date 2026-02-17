@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { ensureEnvVar } from "./github-helpers.mjs";
 
 /**
  * @param {fs.PathOrFileDescriptor} p
@@ -15,10 +16,7 @@ function writeJson(p, obj) {
   fs.writeFileSync(p, JSON.stringify(obj, null, 2) + "\n");
 }
 
-const newVersion = process.env.NEW_VERSION;
-if (!newVersion) {
-  throw new Error("NEW_VERSION env var is required");
-}
+const newVersion = ensureEnvVar("NEW_VERSION");
 
 // Root
 const rootPkgPath = path.resolve("package.json");
