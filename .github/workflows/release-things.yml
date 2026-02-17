@@ -91,6 +91,9 @@ jobs:
 
       - name: Create and push tags
         shell: bash
+        env:
+          NEW_VERSION: ${{ steps.plan.outputs.new_version }}
+          TRACK: ${{ inputs.track  }}
         run: node ./.github/scripts/push-tags.mjs
 
       # - name: Create release for version tag
