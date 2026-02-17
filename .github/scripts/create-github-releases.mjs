@@ -6,7 +6,7 @@ const repositoryName = ensureEnvVar("GITHUB_REPOSITORY"); // provided by Actions
 const versionTag = ensureEnvVar("VERSION_TAG"); // e.g. "release/2.9.0" OR "2.9.0" depending on your tags
 const versionBody = ensureEnvVar("VERSION_BODY");
 
-const versionName = `${RELEASE_PREFIX}${versionTag}`;
+const versionName = versionTag;
 
 const stableTag = "stable";
 const betaTag = "beta";
