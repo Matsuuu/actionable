@@ -12,5 +12,8 @@
   "type": "commonjs",
   "devDependencies": {
     "semver": "^7.7.4"
+  },
+  "dependencies": {
+    "@octokit/rest": "^22.0.1"
   }
 }

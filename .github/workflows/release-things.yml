@@ -103,28 +103,14 @@ jobs:
           NEW_VERSION_TAG: ${{ steps.plan.outputs.new_version_tag }}
         run: node ./.github/scripts/promote-tracks.mjs
 
-      - name: Create a Release on GitHub
-        uses: ncipollo/release-action@v1 # v1
-        with:
-          tag: ${{ steps.plan.outputs.new_version_tag }}
-          prerelease: ${{  inputs.track == 'beta' }}
-          makeLatest: false
-          body: Release ${{ steps.plan.outputs.new_version  }}
-
-      - name: Delete existing track release
+      - name:
+        shell: bash
         env:
-          GH_TOKEN: ${{ github.token }}
-          TAG: ${{ inputs.track }}
-        run: |
-          gh release view "$TAG" >/dev/null 2>&1 && gh release delete "$TAG" -y || true
-
-      - name: Create mirrored release for track tag
-        uses: ncipollo/release-action@v1 # v1
-        with:
-          tag: ${{ inputs.track }}
-          prerelease: ${{  inputs.track == 'beta' }}
-          makeLatest: false
-          body: Release ${{ inputs.track }}
+          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          VERSION_TAG: ${{ steps.plan.outputs.new_version_tag }}
+          VERSION_BODY: Release ${{ steps.plan.outputs.new_version }}
+        run: node ./.github/scripts/create-github-releases.mjs
 
       # - name: Move tags/labels
       #   shell: bash
