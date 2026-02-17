@@ -20,6 +20,15 @@ export function stripReleasePrefixes(tag) {
 }
 
 /**
+ * @param {string} bump
+ *
+ * @returns { bump is import("semver").ReleaseType }
+ * */
+export function isReleaseType(bump) {
+  return ["major", "minor", "patch"].includes(bump);
+}
+
+/**
  * @param {string} cmd
  * @param {readonly string[]} args
  * @param {import("node:child_process").ExecFileOptionsWithStringEncoding} args

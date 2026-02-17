@@ -1,0 +1,61 @@
+import semver from "semver";
+import {
+  isReleaseType,
+  stripReleasePrefixes,
+  writeGithubOutput,
+} from "./github-helpers.mjs";
+
+const track = process.env.TRACK;
+const bump = process.env.BUMP;
+
+const stable = process.env.STABLE_VERSION;
+const beta = process.env.BETA_VERSION;
+const legacy = process.env.LEGACY_VERSION;
+
+let base = null;
+switch (track) {
+  case "stable":
+    base = stable;
+    break;
+  case "beta":
+    base = beta;
+    break;
+  case "legacy":
+    base = legacy;
+    break;
+}
+
+if (!base) {
+  console.error(
+    `Unknown track or missing base version. track=${track} stable=${stable} beta=${beta} legacy=${legacy}`,
+  );
+  process.exit(1);
+}
+
+const cleanedBase = stripReleasePrefixes(base);
+if (!cleanedBase) {
+  console.error(`Invalid base version: ${base}`);
+  process.exit(1);
+}
+
+if (!isReleaseType(bump)) {
+  console.error(`Invalid release type in $bump: ${bump}`);
+  process.exit(1);
+}
+
+const next = semver.inc(cleanedBase, bump);
+if (!next) {
+  console.error(`Could not bump version. base=${cleanedBase} bump=${bump}`);
+  process.exit(1);
+}
+
+const output = {
+  base_version: cleanedBase,
+  new_version: next,
+};
+
+writeGithubOutput(output);
+
+console.log(
+  `Releasing track=${track} bump=${bump} base=${cleanedBase} -> new=${next}`,
+);

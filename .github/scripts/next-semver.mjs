@@ -1,23 +1,10 @@
 import semver from "semver";
-import { writeGithubOutput } from "./github-helpers.mjs";
-
-/**
- * @param {string} raw
- */
-function normalize(raw) {
-  let v = String(raw ?? "").trim();
-  v = v.replace(/^release\//, "");
-  return v;
-}
-
-/**
- * @param {string} bump
- *
- * @returns { bump is import("semver").ReleaseType }
- * */
-function isReleaseType(bump) {
-  return ["major", "minor", "patch"].includes(bump);
-}
+import {
+  isReleaseType,
+  RELEASE_PREFIX,
+  stripReleasePrefixes,
+  writeGithubOutput,
+} from "./github-helpers.mjs";
 
 function main() {
   const rawVersion = process.env.VERSION;
@@ -26,7 +13,7 @@ function main() {
   if (!rawVersion) throw new Error("Missing VERSION env var.");
   if (!bump) throw new Error("Missing BUMP env var.");
 
-  const version = normalize(rawVersion);
+  const version = stripReleasePrefixes(rawVersion);
 
   if (!semver.valid(version)) {
     throw new Error(
@@ -43,7 +30,7 @@ function main() {
     throw new Error(`Failed to bump version "${version}" with bump "${bump}".`);
   }
 
-  const nextTag = `release/${nextVersion}`;
+  const nextTag = `${RELEASE_PREFIX}${nextVersion}`;
 
   writeGithubOutput({
     next_version: nextVersion,
