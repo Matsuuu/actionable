@@ -1,6 +1,6 @@
 {
   "name": "actionable",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "description": "A demo repo for nice patterns inside Github Actions",
   "main": "index.js",
   "scripts": {
