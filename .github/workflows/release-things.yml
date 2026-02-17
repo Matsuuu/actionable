@@ -93,8 +93,15 @@ jobs:
         shell: bash
         env:
           NEW_VERSION: ${{ steps.plan.outputs.new_version }}
-          TRACK: ${{ inputs.track  }}
         run: node ./.github/scripts/push-tags.mjs
+
+      - name: Promote beta → stable and new release → beta
+        shell: bash
+        env:
+          BUMP: ${{ inputs.bump }}
+          BETA_VERSION: ${{ env.BETA_VERSION }}
+          NEW_VERSION_TAG: ${{ steps.plan.outputs.new_version_tag }}
+        run: node ./.github/scripts/promote-tracks.mjs
 
       - name: Create a Release on GitHub
         uses: ncipollo/release-action@v1 # v1
