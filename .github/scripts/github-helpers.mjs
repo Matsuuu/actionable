@@ -1,14 +1,55 @@
 import { execFileSync } from "node:child_process";
 import fs from "node:fs";
+import semver from "semver";
 
-export const RELEASE_TRACKS = [
+export const RELEASE_TRACKS = /** @type { const } */ ([
   //
   "stable",
   "beta",
   "legacy",
-];
+]);
 
 export const RELEASE_PREFIX = "release/";
+
+/**
+ * Given a list of tags, return the highest semver for tags like "release/2.7.0".
+ * Returns the *tag string* (e.g. "release/2.7.0") or null.
+ *
+ * @param {string[]} tags
+ * */
+export function pickHighestReleaseTag(tags) {
+  const versions = tags
+    .filter((t) => t.startsWith(RELEASE_PREFIX))
+    .map((t) => ({ tag: t, v: stripReleasePrefixes(t) }))
+    .filter(({ v }) => semver.valid(v))
+    .sort((a, b) => semver.rcompare(a.v, b.v));
+
+  return versions[0]?.tag ?? null;
+}
+
+/**
+ * Resolve a release track tag (stable/beta/legacy) to the corresponding
+ * release-candidate/<major>.<minor>.x branch, based on the release/<x.y.z> tag
+ * pointing at the same commit.
+ *
+ * Returns null if the track tag or release tag is missing.
+ *
+ * @param { typeof RELEASE_TRACKS[number] } track
+ * */
+export function resolveRcBranchForTrack(track) {
+  const commit = getCommitForRef(track);
+  if (!commit) return null;
+
+  const tagsAtCommit = listTagsPointingAt(commit);
+  const releaseTag = pickHighestReleaseTag(tagsAtCommit);
+  if (!releaseTag) return null;
+
+  const version = stripReleasePrefixes(releaseTag);
+  const parsed = semver.parse(version);
+  if (!parsed) return null;
+
+  return `release-candidate/${parsed.major}.${parsed.minor}.x`;
+}
 
 /**
  * @param {string} tag
@@ -17,6 +58,21 @@ export function stripReleasePrefixes(tag) {
   return tag.startsWith(RELEASE_PREFIX)
     ? tag.slice(RELEASE_PREFIX.length)
     : tag;
+}
+
+/**
+ * @returns { string[] }
+ * */
+export function readPrLabels() {
+  const eventPath = ensureEnvVar("GITHUB_EVENT_PATH");
+
+  const event = JSON.parse(fs.readFileSync(eventPath, "utf8"));
+  /** @type { string[] | { name: string }[] } */
+  const labels = event?.pull_request?.labels ?? [];
+
+  return labels
+    .map((l) => (typeof l === "string" ? l : l?.name))
+    .filter(Boolean);
 }
 
 /**

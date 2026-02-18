@@ -109,22 +109,12 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
           GITHUB_REPOSITORY: ${{ github.repository }}
           VERSION_TAG: ${{ steps.plan.outputs.new_version_tag }}
+          PREVIOUS_STABLE_VERSION: ${{ env.STABLE_VERSION }}
+          PREVIOUS_BETA_VERSION: ${{ env.BETA_VERSION }}
+          PREVIOUS_LEGACY_VERSION: ${{ env.LEGACY_VERSION }}
           VERSION_BODY: Release ${{ steps.plan.outputs.new_version }}
+          TRACK: ${{ inputs.track }}
         run: node ./.github/scripts/create-github-releases.mjs
-
-      # - name: Move tags/labels
-      #   shell: bash
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #   working-directory: ./.github/scripts
-      #   run: |
-      #     node ./post-release-maintenance.mjs \
-      #       --track "${{ env.TRACK }}" \
-      #       --bump "${{ env.BUMP }}" \
-      #       --new-version "${{ steps.plan.outputs.new_version }}" \
-      #       --stable-version "${{ env.STABLE_VERSION }}" \
-      #       --beta-version "${{ env.BETA_VERSION }}" \
-      #       --legacy-version "${{ env.LEGACY_VERSION }}"
 
   ensure_rc_branch:
     name: Ensure RC branch exists

@@ -5,6 +5,21 @@ const token = ensureEnvVar("GITHUB_TOKEN"); // use secrets.GITHUB_TOKEN
 const repositoryName = ensureEnvVar("GITHUB_REPOSITORY"); // provided by Actions
 const versionTag = ensureEnvVar("VERSION_TAG"); // e.g. "release/2.9.0" OR "2.9.0" depending on your tags
 const versionBody = ensureEnvVar("VERSION_BODY");
+const track = ensureEnvVar("TRACK");
+const previousBetaVersion = ensureEnvVar("PREVIOUS_BETA_VERSION");
+const previousStableVersion = ensureEnvVar("PREVIOUS_STABLE_VERSION");
+const previousLegacyVersion = ensureEnvVar("PREVIOUS_LEGACY_VERSION");
+
+const params = {
+  token,
+  repositoryName,
+  versionTag,
+  versionBody,
+  track,
+  previousBetaVersion,
+  previousStableVersion,
+  previousLegacyVersion,
+};
 
 const versionName = versionTag;
 
@@ -84,12 +99,20 @@ async function createOrUpdateRelease({
 }
 
 (async () => {
+  console.log("Preparing for release... Parameters: ");
+  for (const [k, v] of Object.entries(params)) {
+    console.log(`${k}: ${v}`);
+  }
+
+  // TODO: This needs a rework. We want to have this split into functions, since we want to
+  // call different code paths depending on Track
+
   const newReleaseData = /** @type { const } */ ({
     tag_name: versionTag,
     name: versionName,
     body: versionBody,
     draft: false,
-    prerelease: true,
+    prerelease: track === "beta",
     make_latest: "false",
   });
 
@@ -109,25 +132,27 @@ async function createOrUpdateRelease({
     );
   }
 
-  // 3) Delete current beta & stable releases
-  console.log(
-    `Deleting existing "${betaTag}" and "${stableTag}" releases (if any)...`,
-  );
-  await deleteReleaseByTag(betaTag);
-  await deleteReleaseByTag(stableTag);
+  if (track === "beta") {
+    // 3) Delete current beta & stable releases
+    console.log(
+      `Deleting existing "${betaTag}" and "${stableTag}" releases (if any)...`,
+    );
+    await deleteReleaseByTag(betaTag);
+    await deleteReleaseByTag(stableTag);
 
-  // 4) Create stable release (clone beta metadata), mark as latest
-  console.log(
-    `Creating "${stableTag}" release cloned from beta, marked as latest...`,
-  );
-  await createOrUpdateRelease({
-    tag_name: stableTag,
-    name: stableTag,
-    body: currentBetaRelease.body,
-    draft: false,
-    prerelease: false,
-    make_latest: "true",
-  });
+    // 4) Create stable release (clone beta metadata), mark as latest
+    console.log(
+      `Creating "${stableTag}" release cloned from beta, marked as latest...`,
+    );
+    await createOrUpdateRelease({
+      tag_name: stableTag,
+      name: stableTag,
+      body: currentBetaRelease.body,
+      draft: false,
+      prerelease: track === "beta",
+      make_latest: "true",
+    });
+  }
 
   // 5) Create beta release for beta tag, mark as prerelease
   console.log(`Creating "${betaTag}" prerelease...`);

@@ -1,0 +1,31 @@
+on:
+  pull_request:
+    types: [closed]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  backport:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Init NodeJS
+        uses: ./.github/actions/setup-github-actions-node
+
+      - name: Compute backport targets
+        id: targets
+        run: node .github/scripts/compute-backport-targets.mjs
+
+      - name: Backport
+        if: steps.targets.outputs.target_branches != ''
+        uses: korthout/backport-action@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          source_pr_number: ${{ github.event.pull_request.number }}
+          target_branches: ${{ steps.targets.outputs.target_branches }}
