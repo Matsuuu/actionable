@@ -29,3 +29,19 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           source_pr_number: ${{ github.event.pull_request.number }}
           target_branches: ${{ steps.targets.outputs.target_branches }}
+          pull_description: |-
+            # Description
+            Backport of #${pull_number} to `${target_branch}`
+
+            # Original description
+
+            ${pull_description}
+          pull_title: ${pull_title} (backport to ${target_branch})
+          add_author_as_assignee: true
+          copy_assignees: true
+          copy_requested_reviewers: true
+          copy_labels_pattern: '^(?!Backport to\b).+' # Copy everything except backport labels
+          experimental: >
+            {
+              "conflict_resolution": "draft_commit_conflicts"
+            }
